@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Management - Dashboard</title>
+  <link rel="stylesheet" href="../components/Navbar.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eaeaea;
+    }
+    header h1 {
+      color: #333;
+      margin: 0;
+      font-size: 24px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .user-name {
+      font-weight: 500;
+    }
+    .user-role {
+      color: #666;
+      font-size: 14px;
+    }
+    .logout-btn {
+      background-color: transparent;
+      border: none;
+      color: #4a6cf7;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #333;
+    }
+    .card-value {
+      font-size: 32px;
+      font-weight: 600;
+      color: #4a6cf7;
+      margin: 10px 0;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: none;
+    }
+    .data-table th {
+      background-color: #f9f9f9;
+      text-align: left;
+      padding: 12px 15px;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 1px solid #eaeaea;
+    }
+    .data-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eaeaea;
+    }
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    .data-table tr:hover {
+      background-color: #f5f9ff;
+    }
+    .table-container {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+    .table-title {
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #333;
+      display: none;
+    }
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-low {
+      background-color: #ffebee;
+      color: #d32f2f;
+    }
+    .status-medium {
+      background-color: #fff8e1;
+      color: #ff8f00;
+    }
+    .status-good {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Navbar container -->
+    <div id="navbar-container"></div>
+    
+    <!-- Main content -->
+    <div class="main-content">
+      <div class="container">
+        <header>
+          <h1>Dashboard</h1>
+          <div class="user-info">
+            <span id="user-name" class="user-name"></span>
+            <span id="user-role" class="user-role"></span>
+            <button id="logout-btn" class="logout-btn">Logout</button>
+          </div>
+        </header>
+        
+        <div class="card-container">
+          <div id="orders-card" class="card">
+            <h2>Today's Orders</h2>
+            <div id="orders-count" class="card-value">0</div>
+            <div class="card-footer">
+              <span>Click to view details</span>
+              <span id="orders-value">$0</span>
+            </div>
+          </div>
+          
+          <div id="stock-updates-card" class="card">
+            <h2>Stock Updates</h2>
+            <div id="stock-updates-count" class="card-value">0</div>
+            <div class="card-footer">
+              <span>Recent updates</span>
+              <span>Click to view details</span>
+            </div>
+          </div>
+          
+          <div id="pending-orders-card" class="card">
+            <h2>Pending Orders</h2>
+            <div id="pending-orders-count" class="card-value">0</div>
+            <div class="card-footer">
+              <span>Awaiting processing</span>
+              <span id="pending-orders-value">$0</span>
+            </div>
+          </div>
+          
+          <div id="inventory-card" class="card">
+            <h2>Inventory Status</h2>
+            <div id="low-stock-count" class="card-value">0</div>
+            <div class="card-footer">
+              <span>Items with low stock</span>
+              <span>Click to view details</span>
+            </div>
+          </div>
+        </div>
+        
+        <h3 id="orders-table-title" class="table-title">Today's Orders</h3>
+        <div class="table-container">
+          <table id="orders-table" class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Vendor</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table-body">
+              <!-- Orders will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <h3 id="stock-updates-table-title" class="table-title">Stock Updates</h3>
+        <div class="table-container">
+          <table id="stock-updates-table" class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Old Quantity</th>
+                <th>New Quantity</th>
+                <th>Date Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="stock-updates-table-body">
+              <!-- Stock updates will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <h3 id="pending-orders-table-title" class="table-title">Pending Orders</h3>
+        <div class="table-container">
+          <table id="pending-orders-table" class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Vendor</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pending-orders-table-body">
+              <!-- Pending orders will be populated here -->
+            </tbody>
+          </table>
+        </div>
+        
+        <h3 id="inventory-table-title" class="table-title">Inventory Status</h3>
+        <div class="table-container">
+          <table id="inventory-table" class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body">
+              <!-- Inventory will be populated here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../components/Navbar.js"></script>
+  <script>
+    // Check if user is logged in
+    const userString = sessionStorage.getItem('user');
+    if (!userString) {
+      window.location.href = 'login.html';
+    }
+    
+    const user = JSON.parse(userString);
+    
+    // Set user info in header
+    document.getElementById('user-name').textContent = user.username;
+    document.getElementById('user-role').textContent = `(${user.role})`;
+    
+    // Logout functionality
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      sessionStorage.removeItem('user');
+      window.location.href = 'login.html';
+    });
+    
+    // Load dashboard data
+    async function loadDashboardData() {
+      try {
+        // Load today's orders
+        const todayOrders = await window.api.getTodayOrders();
+        const ordersCount = todayOrders.length;
+        const ordersValue = todayOrders.reduce((sum, order) => sum + order.total, 0);
+        
+        document.getElementById('orders-count').textContent = ordersCount;
+        document.getElementById('orders-value').textContent = `$${ordersValue.toFixed(2)}`;
+        
+        // Load pending orders
+        const pendingOrders = await window.api.getPendingOrders();
+        const pendingOrdersCount = pendingOrders.length;
+        const pendingOrdersValue = pendingOrders.reduce((sum, order) => sum + order.total, 0);
+        
+        document.getElementById('pending-orders-count').textContent = pendingOrdersCount;
+        document.getElementById('pending-orders-value').textContent = `$${pendingOrdersValue.toFixed(2)}`;
+        
+        // Load inventory
+        const inventory = await window.api.getInventory();
+        const lowStockItems = inventory.filter(item => item.quantity < 30);
+        
+        document.getElementById('low-stock-count').textContent = lowStockItems.length;
+        
+        // Load transactions for stock updates
+        const transactions = await window.api.getTransactions();
+        const stockUpdates = transactions
+          .filter(transaction => transaction.transaction_type === 'inventory')
+          .slice(0, 5); // Get the 5 most recent
+        
+        document.getElementById('stock-updates-count').textContent = stockUpdates.length;
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+    
+    // Function to populate tables when cards are clicked
+    async function showOrdersTable() {
+      try {
+        // Get detailed orders
+        const orders = await window.api.getDetailedOrders();
+        const todayOrders = orders.filter(order => {
+          const orderDate = new Date(order.date).toLocaleDateString();
+          const today = new Date().toLocaleDateString();
+          return orderDate === today;
+        });
+        
+        // Populate orders table
+        const ordersTable = document.getElementById('orders-table-body');
+        ordersTable.innerHTML = '';
+        
+        if (todayOrders.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="6" style="text-align: center;">No orders found for today</td>';
+          ordersTable.appendChild(row);
+        } else {
+          todayOrders.forEach(order => {
+            const row = document.createElement('tr');
+            
+            // Get items string
+            let itemsText = 'No items';
+            if (order.items && order.items.length > 0) {
+              itemsText = order.items.map(item => `${item.product_name} (${item.quantity})`).join(', ');
+            }
+            
+            row.innerHTML = `
+              <td>${order.order_number}</td>
+              <td>${new Date(order.date).toLocaleDateString()}</td>
+              <td>${order.vendor_name || 'Unknown vendor'}</td>
+              <td>${itemsText}</td>
+              <td>$${order.total.toFixed(2)}</td>
+              <td>
+                <button class="edit-btn" data-id="${order.id}" data-type="order">View</button>
+              </td>
+            `;
+            ordersTable.appendChild(row);
+          });
+        }
+        
+        // Show the table
+        showTable('orders');
+      } catch (error) {
+        console.error('Error loading orders table:', error);
+      }
+    }
+    
+    async function showPendingOrdersTable() {
+      try {
+        // Get detailed orders
+        const allOrders = await window.api.getDetailedOrders();
+        const pendingOrders = allOrders.filter(order => order.status === 'pending');
+        
+        // Populate pending orders table
+        const pendingOrdersTable = document.getElementById('pending-orders-table-body');
+        pendingOrdersTable.innerHTML = '';
+        
+        if (pendingOrders.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="6" style="text-align: center;">No pending orders found</td>';
+          pendingOrdersTable.appendChild(row);
+        } else {
+          pendingOrders.forEach(order => {
+            const row = document.createElement('tr');
+            
+            // Get items string
+            let itemsText = 'No items';
+            if (order.items && order.items.length > 0) {
+              itemsText = order.items.map(item => `${item.product_name} (${item.quantity})`).join(', ');
+            }
+            
+            row.innerHTML = `
+              <td>${order.order_number}</td>
+              <td>${new Date(order.date).toLocaleDateString()}</td>
+              <td>${order.vendor_name || 'Unknown vendor'}</td>
+              <td>${itemsText}</td>
+              <td>$${order.total.toFixed(2)}</td>
+              <td>
+                <button class="edit-btn" data-id="${order.id}" data-type="order">View</button>
+              </td>
+            `;
+            pendingOrdersTable.appendChild(row);
+          });
+        }
+        
+        // Show the table
+        showTable('pending-orders');
+      } catch (error) {
+        console.error('Error loading pending orders table:', error);
+      }
+    }
+    
+    async function showInventoryTable() {
+      try {
+        // Get inventory with products data
+        const inventory = await window.api.getInventory();
+        
+        // Populate inventory table
+        const inventoryTable = document.getElementById('inventory-table-body');
+        inventoryTable.innerHTML = '';
+        
+        if (inventory.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="6" style="text-align: center;">No inventory items found</td>';
+          inventoryTable.appendChild(row);
+        } else {
+          inventory.forEach(item => {
+            let statusClass = 'status-good';
+            let status = 'Good';
+            
+            if (item.quantity < 20) {
+              statusClass = 'status-low';
+              status = 'Low';
+            } else if (item.quantity < 30) {
+              statusClass = 'status-medium';
+              status = 'Medium';
+            }
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.id}</td>
+              <td>${item.name}</td>
+              <td>${item.quantity || 0}</td>
+              <td>$${item.price ? item.price.toFixed(2) : '0.00'}</td>
+              <td><span class="status-badge ${statusClass}">${status}</span></td>
+              <td>
+                <button class="edit-btn" data-id="${item.id}" data-type="inventory">View</button>
+              </td>
+            `;
+            inventoryTable.appendChild(row);
+          });
+        }
+        
+        // Show the table
+        showTable('inventory');
+      } catch (error) {
+        console.error('Error loading inventory table:', error);
+      }
+    }
+    
+    async function showStockUpdatesTable() {
+      try {
+        // Get transactions for stock updates
+        const transactions = await window.api.getTransactions();
+        const stockUpdates = transactions
+          .filter(transaction => transaction.transaction_type === 'inventory')
+          .slice(0, 10); // Get the 10 most recent
+        
+        // Get products for details
+        const products = await window.api.getProducts();
+        
+        // Populate stock updates table
+        const stockUpdatesTable = document.getElementById('stock-updates-table-body');
+        stockUpdatesTable.innerHTML = '';
+        
+        if (stockUpdates.length === 0) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="6" style="text-align: center;">No stock updates found</td>';
+          stockUpdatesTable.appendChild(row);
+        } else {
+          for (const update of stockUpdates) {
+            const product = products.find(p => p.id === update.related_id);
+            if (!product) continue;
+            
+            // Extract old and new quantities from description if available
+            let oldQuantity = 0;
+            let newQuantity = 0;
+            
+            const quantityMatch = update.description.match(/from (\d+) to (\d+)/);
+            if (quantityMatch && quantityMatch.length === 3) {
+              oldQuantity = parseInt(quantityMatch[1]);
+              newQuantity = parseInt(quantityMatch[2]);
+            }
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${update.id}</td>
+              <td>${product.name}</td>
+              <td>${oldQuantity}</td>
+              <td>${newQuantity}</td>
+              <td>${new Date(update.date).toLocaleString()}</td>
+              <td>
+                <button class="edit-btn" data-id="${update.id}" data-type="stockUpdate">View</button>
+              </td>
+            `;
+            stockUpdatesTable.appendChild(row);
+          }
+        }
+        
+        // Show the table
+        showTable('stock-updates');
+      } catch (error) {
+        console.error('Error loading stock updates table:', error);
+      }
+    }
+    
+    // Card click handlers
+    document.getElementById('orders-card').addEventListener('click', function() {
+      showOrdersTable();
+    });
+    
+    document.getElementById('pending-orders-card').addEventListener('click', function() {
+      showPendingOrdersTable();
+    });
+    
+    document.getElementById('inventory-card').addEventListener('click', function() {
+      showInventoryTable();
+    });
+    
+    document.getElementById('stock-updates-card').addEventListener('click', function() {
+      showStockUpdatesTable();
+    });
+    
+    // Function to show the selected table and hide others
+    function showTable(tableType) {
+      const tables = ['orders', 'stock-updates', 'pending-orders', 'inventory'];
+      
+      tables.forEach(type => {
+        const table = document.getElementById(`${type}-table`);
+        const title = document.getElementById(`${type}-table-title`);
+        
+        if (type === tableType) {
+          table.style.display = 'table';
+          title.style.display = 'block';
+        } else {
+          table.style.display = 'none';
+          title.style.display = 'none';
+        }
+      });
+    }
+    
+    // Load data when page is ready
+    loadDashboardData();
+  </script>
+</body>
+</html> 

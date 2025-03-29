@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Management - Login</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo h1 {
+      color: #2c3e50;
+      margin: 0;
+      font-size: 28px;
+    }
+    .logo p {
+      color: #7f8c8d;
+      margin: 10px 0 0;
+      font-size: 16px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #4a6cf7;
+      background-color: #fff;
+    }
+    .login-button {
+      background-color: #4a6cf7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      transition: background-color 0.2s;
+    }
+    .login-button:hover {
+      background-color: #3a5de4;
+    }
+    .error-message {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    .demo-accounts {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+    .demo-accounts h4 {
+      margin: 0 0 10px;
+      color: #333;
+    }
+    .demo-accounts p {
+      margin: 5px 0;
+    }
+    .demo-accounts strong {
+      font-weight: 600;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>Vendor Management</h1>
+      <p>Login to your account</p>
+    </div>
+    
+    <form id="login-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter your username" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+      </div>
+      
+      <button type="submit" class="login-button">Login</button>
+      
+      <div id="error-message" class="error-message"></div>
+    </form>
+    
+    <div class="demo-accounts">
+      <h4>Demo Accounts</h4>
+      <p><strong>Admin:</strong> username: admin / password: admin123</p>
+      <p><strong>Employee:</strong> username: employee / password: employee123</p>
+    </div>
+  </div>
+  
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      try {
+        const result = await window.api.login({username, password});
+        
+        if (result.success) {
+          // Store user in session storage
+          sessionStorage.setItem('user', JSON.stringify(result.user));
+          
+          // Redirect to dashboard
+          window.location.href = 'dashboard.html';
+        } else {
+          // Show error message
+          const errorMessage = document.getElementById('error-message');
+          errorMessage.textContent = result.message || 'Invalid username or password';
+          errorMessage.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        
+        const errorMessage = document.getElementById('error-message');
+        errorMessage.textContent = 'An error occurred while trying to login';
+        errorMessage.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html> 
