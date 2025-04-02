@@ -1,13 +1,13 @@
 // Navbar.js - Responsive left navigation component
-document.addEventListener('DOMContentLoaded', function() {
-  const navbarContainer = document.getElementById('navbar-container');
-  
+document.addEventListener("DOMContentLoaded", function () {
+  const navbarContainer = document.getElementById("navbar-container");
+
   if (navbarContainer) {
     // Get user info from session storage
-    const userString = sessionStorage.getItem('user');
+    const userString = sessionStorage.getItem("user");
     const user = userString ? JSON.parse(userString) : null;
-    const isAdmin = user && user.role === 'admin';
-    
+    const isAdmin = user && user.role === "admin";
+
     // Create navbar HTML structure
     navbarContainer.innerHTML = `
       <div class="navbar">
@@ -47,10 +47,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>Estimates</span>
               </a>
             </li>
-            <li data-page="stock">
-              <a href="stock.html">
+            <li data-page="inventory">
+              <a href="inventory.html">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                <span>Stock Updates</span>
+                <span>Inventory</span>
               </a>
             </li>
             <li data-page="sales">
@@ -65,52 +65,62 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span>Reports</span>
               </a>
             </li>
-            ${isAdmin ? `
+            ${
+              isAdmin
+                ? `
             <li data-page="users">
               <a href="users.html">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 <span>User Management</span>
               </a>
             </li>
-            ` : ''}
+            `
+                : ""
+            }
           </ul>
         </nav>
         <div class="navbar-footer">
           <div class="user-info">
-            <span id="sidebar-user-name" class="user-name">${user ? user.username : ''}</span>
-            <span id="sidebar-user-role" class="user-role">${user ? `(${user.role})` : ''}</span>
+            <span id="sidebar-user-name" class="user-name">${
+              user ? user.username : ""
+            }</span>
+            <span id="sidebar-user-role" class="user-role">${
+              user ? `(${user.role})` : ""
+            }</span>
           </div>
           <button id="sidebar-logout-btn" class="logout-btn">Logout</button>
         </div>
       </div>
     `;
-    
+
     // Handle navbar toggle for mobile devices
-    const navbarToggle = document.getElementById('navbar-toggle');
-    const navbar = document.querySelector('.navbar');
-    
+    const navbarToggle = document.getElementById("navbar-toggle");
+    const navbar = document.querySelector(".navbar");
+
     if (navbarToggle) {
-      navbarToggle.addEventListener('click', function() {
-        navbar.classList.toggle('navbar-collapsed');
+      navbarToggle.addEventListener("click", function () {
+        navbar.classList.toggle("navbar-collapsed");
       });
     }
-    
+
     // Set active page in navbar
-    const currentPage = window.location.pathname.split('/').pop().split('.')[0];
-    const activeMenuItem = document.querySelector(`[data-page="${currentPage}"]`);
-    
+    const currentPage = window.location.pathname.split("/").pop().split(".")[0];
+    const activeMenuItem = document.querySelector(
+      `[data-page="${currentPage}"]`
+    );
+
     if (activeMenuItem) {
-      activeMenuItem.classList.add('active');
+      activeMenuItem.classList.add("active");
     }
-    
+
     // Add logout functionality to sidebar logout button
-    const sidebarLogoutBtn = document.getElementById('sidebar-logout-btn');
-    
+    const sidebarLogoutBtn = document.getElementById("sidebar-logout-btn");
+
     if (sidebarLogoutBtn) {
-      sidebarLogoutBtn.addEventListener('click', () => {
-        sessionStorage.removeItem('user');
-        window.location.href = 'login.html';
+      sidebarLogoutBtn.addEventListener("click", () => {
+        sessionStorage.removeItem("user");
+        window.location.href = "login.html";
       });
     }
   }
-}); 
+});
